@@ -1,0 +1,17 @@
+{
+  "name": "yet-another-ics-proxy",
+  "version": "1.0.0",
+  "description": "A lightweight and stateless ICS proxy running on Alpine Linux",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "typescript": "^6.0.3"
+  }
+}
