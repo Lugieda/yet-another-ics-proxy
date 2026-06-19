@@ -8,7 +8,7 @@ COPY src/package.json src/tsconfig.json ./
 RUN npm install
 
 # Bundle source and build
-COPY src/server.ts ./
+COPY src/server.ts src/modules ./
 RUN npm run build
 
 FROM node:26-alpine
