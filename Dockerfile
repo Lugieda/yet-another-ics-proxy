@@ -16,6 +16,7 @@ WORKDIR /usr/src/app
 
 COPY src/package.json ./
 COPY --from=build /usr/src/app/dist ./dist
+RUN npm install --omit=dev
 
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

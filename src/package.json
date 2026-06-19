@@ -12,9 +12,11 @@
   "engines": {
     "node": ">=26"
   },
+  "dependencies": {
+    "windows-iana": "^5.1.0"
+  },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "typescript": "^6.0.3",
-    "windows-iana": "^5.1.0"
+    "typescript": "^6.0.3"
   }
 }
