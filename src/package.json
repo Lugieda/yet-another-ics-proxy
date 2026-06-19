@@ -5,13 +5,15 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js"
+    "build:dev": "tsc --watch",
+    "start": "node dist/server.js",
+    "start:dev": "node --watch dist/server.js"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=26"
   },
   "devDependencies": {
-    "@types/node": "^24.13.2",
-    "typescript": "^6.0.3"
+    "@types/node": "^26.0.0",
+    "typescript": "^6.0.3",
   }
 }
