@@ -1,19 +1,8 @@
-import http from 'http';
+import { createServer } from "node:http";
+import { requestHandler } from "./modules/request-handler";
 
-const PORT: string | number = process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 3000;
 
-const requestHandler = (req: http.IncomingMessage, res: http.ServerResponse): void => {
-  if (req.url === '/') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('yet-another-ics-proxy is running');
-    return;
-  }
+createServer(requestHandler).listen(PORT);
 
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Not found');
-};
-
-const server = http.createServer(requestHandler);
-server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+console.log(`Server listening on port ${PORT}`);

@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2024",
-    "module": "commonjs",
+    "target": "es2025",
+    "module": "nodenext",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": ["node"],
+    "noImplicitAny": true
   },
-  "include": ["server.ts"],
+  "include": ["server.ts", "modules/**/**.ts"]
 }
