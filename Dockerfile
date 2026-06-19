@@ -11,7 +11,8 @@ COPY src/package.json src/package-lock.json src/tsconfig.json ./
 RUN npm ci
 
 # 3. Copy the rest of the source code and compile
-COPY src/server.ts src/modules ./
+COPY src/server.ts ./
+COPY src/modules/ ./modules/
 RUN npm run build
 
 # ==========================================
