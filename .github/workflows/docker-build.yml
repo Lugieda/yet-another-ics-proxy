@@ -1,5 +1,7 @@
+# CI workflow to build and publish a Docker image to GitHub Container Registry.
 name: Docker image build
 
+# Trigger: pushes and pull requests targeting main, plus manual dispatch.
 on:
   push:
     branches:
@@ -9,6 +11,7 @@ on:
       - main
   workflow_dispatch: {}
 
+# Minimal permissions required: read repo contents and write packages.
 permissions:
   contents: read
   packages: write
@@ -18,12 +21,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository to access the Dockerfile and context.
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # Buildx enables advanced build features (multi-platform, cache, etc.).
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
+      # Log in to GHCR using the GITHUB_TOKEN for authentication.
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
         with:
@@ -31,10 +37,29 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Convert the repository name to lowercase for consistent image naming.
+      - name: Set lowercase repository name
+        run: |
+          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
+      # Produces image tags and labels based on the git ref and event.
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.REPO_LC }}
+          tags: |
+            # Tag PRs with "pr-<number>" (e.g., pr-12)
+            type=ref,event=pr
+            # Tag main branch pushes with "latest"
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Builds the image using the repo root Dockerfile and pushes to GHCR.
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/lugieda/yet-another-ics-proxy:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
