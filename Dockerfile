@@ -1,24 +1,37 @@
+# ==========================================
+# STAGE 1: Build Environment
+# ==========================================
 FROM node:26-alpine AS build
-
-# Create app directory
 WORKDIR /usr/src/app
 
-# Install dependencies required for build
-COPY src/package.json src/tsconfig.json ./
-RUN npm install
+# 1. Copy ONLY package files to leverage Docker layer caching
+COPY src/package.json src/package-lock.json src/tsconfig.json ./
 
-# Bundle source and build
+# 2. Use 'npm ci' for a fast, strict, clean install based on the lockfile
+RUN npm ci
+
+# 3. Copy the rest of the source code and compile
 COPY src/server.ts src/modules ./
 RUN npm run build
 
+# ==========================================
+# STAGE 2: Production Image
+# ==========================================
 FROM node:26-alpine
 WORKDIR /usr/src/app
 
-COPY src/package.json ./
+# 1. Copy package files to install ONLY production dependencies
+COPY src/package.json src/package-lock.json ./
+RUN npm ci --omit=dev
+
+# 2. Copy ONLY the compiled JavaScript from Stage 1
 COPY --from=build /usr/src/app/dist ./dist
-RUN npm install --omit=dev
 
 EXPOSE 3000
+
+# 3. Healthcheck to ensure the container is running properly
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD node -e 'const http = require("http"); const req = http.get("http://127.0.0.1:3000/status", res => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on("error", () => process.exit(1));'
+
+# 4. Start the server
 CMD ["node", "dist/server.js"]
