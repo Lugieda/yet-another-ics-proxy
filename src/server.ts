@@ -1,7 +1,8 @@
 import { createServer } from "node:http";
 import { requestHandler } from "./modules/request-handler";
+import { Environment } from "./modules/environment";
 
-const PORT = process.env.PORT ?? 3000;
+const PORT = Environment.PORT;
 
 createServer(requestHandler).listen(PORT);
 
