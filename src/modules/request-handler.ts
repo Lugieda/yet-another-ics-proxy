@@ -47,8 +47,6 @@ async function handleProxyRequest(
         isHttpAllowed,
         isHttpsAllowed,
         isHostAllowed,
-        ENABLE_HTTP,
-        ALLOWED_HOSTS,
       });
       return handleForbiddenException(res);
     }
@@ -75,7 +73,6 @@ async function handleProxyRequest(
 
     res.end(ics);
   } catch (error) {
-    console.trace("Error processing ICS URI:", error);
     console.error("Failed to process ICS URI:", error);
     return handleInternalServerErrorException(res);
   }

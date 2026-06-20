@@ -7,4 +7,5 @@ const PORT = Environment.PORT;
 createServer(requestHandler).listen(PORT);
 
 console.log(`Server listening on port ${PORT}`);
+console.log("Environment Variables:");
 console.dir(Environment);
