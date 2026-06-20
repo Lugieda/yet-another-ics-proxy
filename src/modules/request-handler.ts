@@ -54,6 +54,7 @@ async function handleProxyRequest(
     }
 
     // 2. Fetch the ICS file from the target URI
+    console.log("Fetching URL:", url.toString());
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -74,6 +75,7 @@ async function handleProxyRequest(
 
     res.end(ics);
   } catch (error) {
+    console.trace("Error processing ICS URI:", error);
     console.error("Failed to process ICS URI:", error);
     return handleInternalServerErrorException(res);
   }
