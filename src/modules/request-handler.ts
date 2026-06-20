@@ -1,5 +1,9 @@
 import { IncomingMessage, ServerResponse } from "node:http";
 import { icsTranslator } from "./ics-translator";
+import { Environment } from "./environment";
+
+const ALLOWED_HOSTS = Environment.ALLOWED_HOSTS;
+const ENABLE_HTTP = Environment.ENABLE_HTTP;
 
 export async function requestHandler(
   req: IncomingMessage,
@@ -29,8 +33,26 @@ async function handleProxyRequest(
   }
 
   try {
-    // 1. Fetch the remote ICS file
+    // 1. Sanitize the target URI
     const url = new URL(targetUri);
+
+    const hostname = url.hostname.toLowerCase();
+    const isHttpAllowed = ENABLE_HTTP && url.protocol === "http:";
+    const isHttpsAllowed = url.protocol === "https:";
+    const isHostAllowed = ALLOWED_HOSTS.includes(hostname);
+
+    if (!(isHttpAllowed || isHttpsAllowed) || !isHostAllowed) {
+      console.log(`Forbidden URL: ${url}`);
+      console.dir({
+        isHttpAllowed,
+        isHttpsAllowed,
+        isHostAllowed,
+      });
+      return handleForbiddenException(res);
+    }
+
+    // 2. Fetch the ICS file from the target URI
+    console.log("Fetching URL:", url.toString());
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -39,10 +61,10 @@ async function handleProxyRequest(
       return handleInternalServerErrorException(res);
     }
 
-    // 2. Process and translate the file
+    // 3. Process and translate the file
     const ics = icsTranslator(await response.text());
 
-    // 3. Return the translated ICS file to the caller
+    // 4. Return the translated ICS file to the caller
     res.writeHead(200, {
       "Content-Type": "text/calendar; charset=utf-8",
       "Content-Disposition": 'attachment; filename="calendar.ics"',
@@ -77,4 +99,9 @@ function handleBadRequestException(res: ServerResponse) {
 function handleInternalServerErrorException(res: ServerResponse) {
   res.writeHead(500, { "Content-Type": "text/plain" });
   res.end("Internal Server Error");
+}
+
+function handleForbiddenException(res: ServerResponse) {
+  res.writeHead(403, { "Content-Type": "text/plain" });
+  res.end("Forbidden");
 }

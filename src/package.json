@@ -7,7 +7,7 @@
     "build": "tsc",
     "build:dev": "tsc --watch",
     "start": "node dist/server.js",
-    "start:dev": "node --watch dist/server.js"
+    "start:dev": "node --env-file=.env --watch dist/server.js"
   },
   "engines": {
     "node": ">=26"
